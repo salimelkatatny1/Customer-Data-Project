@@ -226,9 +226,8 @@ with tab3:
         st.subheader("📊 Correlation Heatmap")
         corr_df = df[num_cols].dropna().corr()
         fig, ax = plt.subplots(figsize=(5, 4))
-        sns.heatmap(corr_df, annot=True, fmt=".2f", cmap="coolwarm",
-                    linewidths=0.5, ax=ax)
-        plt.tight_layout()
+        fig, ax = plt.subplots(figsize=(8, 6))
+        sns.heatmap(df[num_cols].corr(), annot=True, cmap="coolwarm", ax=ax)
         st.pyplot(fig)
 
 
