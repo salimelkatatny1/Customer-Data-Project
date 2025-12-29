@@ -270,18 +270,30 @@ with tab5:
 
     st.subheader("📋 Customer Snapshot")
     st.dataframe(input_data)
-
     if st.button("🚀 Predict"):
-        X_prep = preprocess.transform(input_data)
-        pred = float(model.predict(X_prep)[0])
-        confidence = max(0.0, 1 - (mae / (abs(pred) + 1e-6)))
-        confidence = min(confidence, 1.0)
+        try:
+        # Add dummy target to match preprocessing
+            input_data["purchase_amount"] = 0
 
-        c1, c2, c3 = st.columns(3)
-        c1.metric("💵 Predicted Amount", f"${pred:,.2f}")
-        c2.metric("📉 Expected Error", f"± ${mae:.2f}")
-        c3.metric("📊 Confidence", f"{confidence*100:.1f}%")
-        st.progress(int(confidence * 100))
+        # Match training feature order
+            input_data = input_data[preprocess.feature_names_in_]
+
+            X_prep = preprocess.transform(input_data)
+            pred = float(model.predict(X_prep)[0])
+
+            confidence = max(0.0, 1 - (mae / (abs(pred) + 1e-6)))
+            confidence = min(confidence, 1.0)
+
+            c1, c2, c3 = st.columns(3)
+            c1.metric("💵 Predicted Amount", f"${pred:,.2f}")
+            c2.metric("📉 Expected Error", f"± ${mae:.2f}")
+            c3.metric("📊 Confidence", f"{confidence*100:.1f}%")
+            st.progress(int(confidence * 100))
+
+        except Exception as e:
+            st.error("❌ Prediction failed")
+            st.exception(e)
+
 
 # =====================================================
 # 📊 TAB 2: EDA
